@@ -33,6 +33,7 @@ declare class Editor extends ClassicEditor {
         toolbar: {
             items: string[];
         };
+        allowedContent: true,
         language: string;
         image: {
             toolbar: string[];
