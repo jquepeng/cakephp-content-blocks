@@ -8,6 +8,8 @@ use Authorization\AuthorizationService;
 use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use Cake\Log\Log;
+use HTMLPurifier;
+use HTMLPurifier_Config;
 use Psr\Http\Message\UploadedFileInterface;
 
 /**
@@ -95,8 +97,15 @@ class ContentBlocksController extends AppController {
 
             } else if ($contentBlock->type === 'html') {
 
+                // Update config to allow for oembed and safeIframe
+                $config = HTMLPurifier_Config::createDefault();
+                $config->set('HTML.SafeIframe', true);
+                $config->set('URI.SafeIframeRegexp', '%^(https?:)?//(www.youtube.com/embed/|player.vimeo.com/video/)%');
+                $purifier = new HTMLPurifier($config);
+
+
                 // Sanitize the input to make it safe from XSS vulnerabilities.
-                $html = \HTMLPurifier::getInstance()->purify($this->request->getData('value'));
+                $html = $purifier->purify($this->request->getData('value'));
                 $contentBlock->value = $html;
 
             }
